@@ -6,7 +6,7 @@
 ---
 ### description
 ---
-### Version naming
+<!-- ### Version naming
 All versions are named with this scheme:
 >"v"+"\_"+type+"\_"+numbers
 
@@ -24,16 +24,16 @@ valid increment examples include:
 When asking to merge your changes, make sure to change the version name to your liking, for example:
 
 it's a finished version:    
-v\_Canary\_2.3.3 --> v\_Release\_2.3.3
+v\_Canary\_2.3.3 -> v\_Release\_2.3.3
 
 most of the changes you need for the next version are there, but there's still some bugs to iron out:    
-v\_Release\_2.3.2 --> v\_Canary\_2.3.3,  
-v\_Release\_2.3.2 --> v\_Canary\_2.3.2.1
+v\_Release\_2.3.2 -> v\_Canary\_2.3.3,  
+v\_Release\_2.3.2 -> v\_Canary\_2.3.2.1
 
 for releases before v\_Release\_1:    
-v\_Alpha\_0.6.4 --> v\_Alpha\_0.7,  
-v\_Alpha\_0.9.2 --> v\_Goose\_0.10,  
-v\_Alpha\_0.12.0--> v\_Canary\_1
+v\_Alpha\_0.6.4 -> v\_Alpha\_0.7,  
+v\_Alpha\_0.9.2 -> v\_Goose\_0.10,  
+v\_Alpha\_0.12.0-> v\_Canary\_1
 
 note: you can also include the previous version in parentheses for clarity:    
 v\_Canary\_1.2.1 (previous: v\_Release\_1.2)
@@ -41,6 +41,7 @@ v\_Canary\_1.2.1 (previous: v\_Release\_1.2)
 All versions (**including Canary**) have to be properly tested, reviewed and the version label must be accordingly changed before being added to the version history
 
 ---
+ -->
 ### Development notes, don't copy
 #### Alpha 0.1 checklist
 ##### expected date of release: end may 2022
