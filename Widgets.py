@@ -3,25 +3,34 @@ from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.checkbox import CheckBox
+from kivy.uix.filechooser import FileChooser
+from kivy.uix.textinput import TextInput
+from kivy.uix.dropdown import DropDown
 from kivy.core.window import Window
 from kivy.properties import *
 
 class menuBar(GridLayout):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.rows=1
         self.size_hint_x=1
         self.size_hint_y=0.05
-        super().__init__(**kwargs)
-        self.file_menu = Button(
+#       ——————————————————————————————
+        self.file_menu_button = Button(
             text="File",
             font_size=12
         )
+        self.filemenu=DropDown()
+        self.filemenu_fileselect=Button(
+            text="Open File"
+        )
+        self.filemenu.add_widget(self.filemenu_fileselect)
+        self.file_menu_button.bind(on_press=self.filemenu.open)
         self.insert_menu = Button(
             text="Insert",
             font_size=12
         )
-        self.add_widget(self.file_menu)
+        self.add_widget(self.file_menu_button)
         self.add_widget(self.insert_menu)
 
 class view(RelativeLayout):
@@ -56,5 +65,12 @@ class view(RelativeLayout):
         self.clear_widgets()
         menus=menuBar(pos_hint={"x":0,"y":0.95})
         self.add_widget(menus)
-        
+        textinput=TextInput(
+            size_hint=(0.85,0.9),
+            pos_hint={"x":0.25,"y":0},
+            background_color= [0.3,0.3,0.3,1]
+
+        )
+        self.add_widget(textinput)
+
         
