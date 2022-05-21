@@ -1,14 +1,34 @@
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.widget import Widget
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.filechooser import FileChooser
-from kivy.uix.textinput import TextInput
-from kivy.uix.dropdown import DropDown
 from kivy.core.window import Window
-from kivy.properties import *
 from kivy.logger import Logger
+from kivy.properties import *
+from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
+from kivy.uix.filechooser import FileChooser
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
+
+edited_file = None
+class fileHandler():
+    #open file; autosave; put text into textinput at open.
+    def __init__(self,filepath:str="",**kwargs) -> None:
+        self.filepath=filepath
+    def get_content(self):
+        with open(self.filepath,'r') as file:
+            file_content=file.read()
+            Logger.info("FileRead:"+file_content)
+            return file_content
+    def set_content(self,text:str):
+        with open(self.filepath,'w') as file:
+            file.write(text)
+            Logger.info("FileWrite:"+text)
+    def append_content(self,text:str,end_l_string:str='\n'):
+        with open(self.filepath,'a') as file:
+            file.write(text+end_l_string)
+            Logger.info("FileAppend:"+text)
+
 
 class menuBar(GridLayout):
     filepath=StringProperty("")
@@ -18,6 +38,9 @@ class menuBar(GridLayout):
         self.rows=1
         self.size_hint_x=1
         self.size_hint_y=0.04
+        if len(self.filepath)>0:
+            global edited_file
+            edited_file = fileHandler(self.filepath)
 #       ——————————————————————————————
         self.file_menu_button = Button(
             text="File",
