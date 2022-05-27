@@ -9,6 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
+from kivy.uix.popup import Popup
 from kivy.graphics import Color, Rectangle
 
 class BackgroundLayout(RelativeLayout):
@@ -71,6 +72,16 @@ class TextInputCustom(RelativeLayout):
         file.set_content(output)
         Logger.info(f"Saved:{output}")
 
+class FileSelectionPopupContent(GridLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.cols=1
+        text=Label(text="Type full filepath of the file you want to select and enter:")
+        self.input=TextInput(hint_text="filepath",multiline=False)
+        self.add_widget(text)
+        self.add_widget(self.input)
+
+
 class menuBar(GridLayout):
     filepath=StringProperty("")
     filename=StringProperty("Filename not defined")
@@ -124,7 +135,14 @@ class menuBar(GridLayout):
             color=[0.1,0.6,0.3,1],
             font_size=12
         )
-        
+        self.filemenu_fileselect_popup_content=FileSelectionPopupContent()
+        self.filemenu_fileselect_popup=Popup(
+            title="File Selection",
+            content=self.filemenu_fileselect_popup_content,
+            size_hint=[0.5,0.2],
+            pos_hint={"x":0.25,"y":0.4}
+        )
+        self.filemenu_fileselect.bind(on_release=self.filemenu_fileselect_popup.open)
         self.filemenu.add_widget(self.filemenu_filename)
         self.filemenu.add_widget(self.filemenu_fileselect)
         self.filemenu.add_widget(self.filemenu_properties)
@@ -192,8 +210,14 @@ class view(BackgroundLayout):
             size_hint=(0.85,0.96),
             pos_hint={"x":0.25,"y":0},   
         )
-        menus.filemenu_save_file.bind(on_press=lambda x:textinput.save_to_file(self.file))
+        menus.filemenu_save_file.bind(on_press=lambda x:textinput.save_to_file(self.file))  #x is needed to absorb instance information
+        menus.filemenu_fileselect_popup_content.input.bind(on_text_validate=lambda x:self.set_filepath_from_input(x))
         self.add_widget(menus)
         self.add_widget(textinput)
+    def set_filepath_from_input(self,input:TextInput):
+        Logger.info("File changed:"+input._get_text())
+        self.filepath=input._get_text()
+        self.file=fileHandler(self.filepath)
+
 
         
