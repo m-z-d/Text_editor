@@ -19,7 +19,7 @@ class BackgroundLayout(RelativeLayout):
         super().__init__(**kwargs)
 
         with self.canvas.before:
-            Color(0.1,0.1, 0.125, 1)
+            Color(0.1,0.1, 0.15, 1)
             self.rect = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_rect, pos=self._update_rect)
@@ -81,13 +81,14 @@ class FileSelectionPopupContent(GridLayout):
         self.add_widget(text)
         self.add_widget(self.input)
 
+class sideBar(GridLayout):
+    pass
 
-class menuBar(GridLayout):
+class menuBar(RelativeLayout):
     filepath=StringProperty("")
     filename=StringProperty("Filename not defined")
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)
-        self.rows=1
         self.size_hint_x=1
         self.size_hint_y=0.04
 #       ——————————————————————————————
@@ -96,11 +97,10 @@ class menuBar(GridLayout):
             background_normal="0x000000ff",
             background_color=[0.2,0.2,0.225,1],
             color=[0.1,0.6,0.3,1],
-            font_size=12
+            font_size=12,
+            size_hint=[0.2,1]
         )
-        self.filemenu=DropDown(
-            auto_width=False,
-            size_hint_x=0.3)
+        self.filemenu=DropDown()
         self.filemenu_filename=Label(
             text="Name: "+self.filename,
             size_hint=(0.9,None),
@@ -154,12 +154,18 @@ class menuBar(GridLayout):
             background_normal="0x000000ff",
             background_color=[0.2,0.2,0.225,1],
             color=[0.6,0.3,0.1,1],
-            font_size=12
+            font_size=12,
+            size_hint=[0.2,1],
+            pos_hint={"x":0.2}
         )
         self.add_widget(self.file_menu_button)
         self.add_widget(self.insert_menu)
     def on_filepath(self, instance, value):
-        self.filename=value.split("\\")[-1].split("/")[-1]
+        self.filename=value.split("\\")[-1].split("/")[-1]  #extracts filename from full filepath, ignores all folder names etc.
+        if len(self.filename)<10:
+            self.filemenu_filename.text=self.filename
+        else:
+            self.filemenu_filename.text=str(self.filename.split(".")[0][:10]+"...")
 
 class view(BackgroundLayout):
     cmd_line_args=ListProperty([])
@@ -189,7 +195,7 @@ class view(BackgroundLayout):
         halign="center",
         font_size=24,
         background_normal="0x000000ff",
-        background_color=[0.1,0.1,0.125,1]
+        background_color=[0.1,0.1,0.15,1]
         )
         start_button.bind(on_press=self.Edit_view)
         self.add_widget(start_button)
@@ -204,16 +210,19 @@ class view(BackgroundLayout):
                 next_arg_is_filepath=True
 
         self.file=fileHandler(self.filepath)
-        menus=menuBar(pos_hint={"x":0,"y":0.96},filepath=self.filepath)
+        self.menus=menuBar(pos_hint={"x":0,"y":0.96},filepath=self.filepath)
         textinput=TextInputCustom(
             self.file,
             size_hint=(0.85,0.96),
             pos_hint={"x":0.25,"y":0},   
         )
-        menus.filemenu_save_file.bind(on_press=lambda x:textinput.save_to_file(self.file))  #x is needed to absorb instance information
-        menus.filemenu_fileselect_popup_content.input.bind(on_text_validate=lambda x:self.set_filepath_from_input(x))
-        self.add_widget(menus)
+        self.menus.filemenu_save_file.bind(on_press=lambda x:textinput.save_to_file(self.file))  #x is needed to absorb instance information
+        self.menus.filemenu_fileselect_popup_content.input.bind(on_text_validate=lambda x:self.set_filepath_from_input(x))
+        self.add_widget(self.menus)
         self.add_widget(textinput)
+    def on_filepath(self, instance, value):
+        self.menus.filepath=value
+
     def set_filepath_from_input(self,input:TextInput):
         Logger.info("File changed:"+input._get_text())
         self.filepath=input._get_text()
