@@ -67,6 +67,8 @@ class TextInputCustom(RelativeLayout):
 
         )
         self.add_widget(self.text_box)
+    def set_text_to_file(self,file:fileHandler,*args,**kwargs):
+        self.text_box._set_text(file.get_content())
     def save_to_file(self,file:fileHandler):
         output="\n".join(self.text_box._lines)
         file.set_content(output)
@@ -81,7 +83,23 @@ class FileSelectionPopupContent(GridLayout):
         self.add_widget(text)
         self.add_widget(self.input)
 
-class sideBar(GridLayout):
+class sideBar(RelativeLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.settings=Button(
+            pos_hint={"x":0,"y":0.9},
+            size_hint=[None,0.2],
+            background_normal="settings.png"
+        )
+        self.settings.bind(height=lambda x,y:self.buttonheight(x,y))
+
+        self.add_widget(self.settings)
+    def buttonheight(self,instance,value):instance.width=value
+class sideDisplay(RelativeLayout):
+    def __init__(self,file,**kw):
+        super().__init__(**kw)
+        self.bar=sideBar(size_hint=[0.2,1])
+        # self.add_widget(self.bar)
     pass
 
 class menuBar(RelativeLayout):
@@ -156,7 +174,7 @@ class menuBar(RelativeLayout):
             color=[0.6,0.3,0.1,1],
             font_size=12,
             size_hint=[0.2,1],
-            pos_hint={"x":0.2}
+            pos_hint={"x":0.205}
         )
         self.add_widget(self.file_menu_button)
         self.add_widget(self.insert_menu)
@@ -177,7 +195,7 @@ class view(BackgroundLayout):
     def Welcome_view(self):
         username=""
         self.name="Welcome screen"
-        Welcome_label=Label(text="Welcome to the Generic Text Editor Project\n\nby LasevIX_",
+        self.Welcome_label=Label(text="Welcome to the Generic Text Editor Project\n\nby LasevIX_",
         font_name="fonts/Helvetica.ttf",
         font_size=24,
         valign="center",
@@ -187,8 +205,8 @@ class view(BackgroundLayout):
         size_hint_x=1,
         pos_hint={"x":0,"y":0.5},
         )
-        self.add_widget(Welcome_label)
-        start_button=Button(text="Click here to start",
+        self.add_widget(self.Welcome_label)
+        self.start_button=Button(text="Click here to start",
         size_hint_y=0.5,
         size_hint_x=1,
         valign="center",
@@ -197,8 +215,8 @@ class view(BackgroundLayout):
         background_normal="0x000000ff",
         background_color=[0.1,0.1,0.15,1]
         )
-        start_button.bind(on_press=self.Edit_view)
-        self.add_widget(start_button)
+        self.start_button.bind(on_press=self.Edit_view)
+        self.add_widget(self.start_button)
     def Edit_view(self,*args,**kwargs):
         next_arg_is_filepath=False
         self.clear_widgets()
@@ -211,15 +229,20 @@ class view(BackgroundLayout):
 
         self.file=fileHandler(self.filepath)
         self.menus=menuBar(pos_hint={"x":0,"y":0.96},filepath=self.filepath)
-        textinput=TextInputCustom(
+        self.textinput=TextInputCustom(
             self.file,
-            size_hint=(0.85,0.96),
+            size_hint=(0.85,0.95),
             pos_hint={"x":0.25,"y":0},   
         )
-        self.menus.filemenu_save_file.bind(on_press=lambda x:textinput.save_to_file(self.file))  #x is needed to absorb instance information
+        self.side=sideDisplay(
+            self.file,
+            size_hint=[0.25,0.95]
+        )
+        self.menus.filemenu_save_file.bind(on_press=lambda x:self.textinput.save_to_file(self.file))  #x is needed to absorb instance information
         self.menus.filemenu_fileselect_popup_content.input.bind(on_text_validate=lambda x:self.set_filepath_from_input(x))
         self.add_widget(self.menus)
-        self.add_widget(textinput)
+        self.add_widget(self.textinput)
+        self.add_widget(self.side)
     def on_filepath(self, instance, value):
         self.menus.filepath=value
 
